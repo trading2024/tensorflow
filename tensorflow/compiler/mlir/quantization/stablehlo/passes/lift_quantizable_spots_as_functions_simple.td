@@ -75,3 +75,27 @@ def LiftAdd : Pat<
     (ArgumentList $lhs, $rhs),
     (ResultList $res)),
   [(IsNotInLiftedFunc $res), (IsNotInStableHloOpRegion $res)], [], (addBenefit 1)>;
+
+def LiftDiv : Pat<
+  (StableHLO_DivOp:$res
+      $lhs, $rhs),
+  (LiftAsTFXlaCallModule<"composite_div_fn">
+    (ArgumentList $lhs, $rhs),
+    (ResultList $res)),
+  [(IsNotInLiftedFunc $res), (IsNotInStableHloOpRegion $res)], [], (addBenefit 1)>;
+
+def LiftMul : Pat<
+  (StableHLO_MulOp:$res
+      $lhs, $rhs),
+  (LiftAsTFXlaCallModule<"composite_mul_fn">
+    (ArgumentList $lhs, $rhs),
+    (ResultList $res)),
+  [(IsNotInLiftedFunc $res), (IsNotInStableHloOpRegion $res)], [], (addBenefit 1)>;
+
+def LiftSubtract : Pat<
+  (StableHLO_MulOp:$res
+      $lhs, $rhs),
+  (LiftAsTFXlaCallModule<"composite_subtract_fn">
+    (ArgumentList $lhs, $rhs),
+    (ResultList $res)),
+  [(IsNotInLiftedFunc $res), (IsNotInStableHloOpRegion $res)], [], (addBenefit 1)>;

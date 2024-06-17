@@ -68,11 +68,14 @@ using ::mlir::stablehlo::AddOp;
 using ::mlir::stablehlo::BroadcastInDimOp;
 using ::mlir::stablehlo::ConcatenateOp;
 using ::mlir::stablehlo::ConvolutionOp;
+using ::mlir::stablehlo::DivOp;
 using ::mlir::stablehlo::DotGeneralOp;
 using ::mlir::stablehlo::DynamicBroadcastInDimOp;
 using ::mlir::stablehlo::GatherOp;
 using ::mlir::stablehlo::GetDimensionSizeOp;
+using ::mlir::stablehlo::MulOp;
 using ::mlir::stablehlo::ReshapeOp;
+using ::mlir::stablehlo::SubtractOp;
 using ::mlir::stablehlo::UniformQuantizeOp;
 using ::stablehlo::quantization::Method;
 using ::stablehlo::quantization::QuantizedDimension;
@@ -1021,6 +1024,12 @@ void PopulateCommonQuantizationPatterns(
 void PopulateAllQuantizablePatterns(MLIRContext& ctx,
                                     RewritePatternSet& patterns) {
   patterns.add<XlaCallModuleOpToCallOp<QuantizeSingularOpPattern<AddOp>>>(
+      ctx, /*enable_per_channel_quantized_weight=*/false);
+  patterns.add<XlaCallModuleOpToCallOp<QuantizeSingularOpPattern<DivOp>>>(
+      ctx, /*enable_per_channel_quantized_weight=*/false);
+  patterns.add<XlaCallModuleOpToCallOp<QuantizeSingularOpPattern<MulOp>>>(
+      ctx, /*enable_per_channel_quantized_weight=*/false);
+  patterns.add<XlaCallModuleOpToCallOp<QuantizeSingularOpPattern<SubtractOp>>>(
       ctx, /*enable_per_channel_quantized_weight=*/false);
 }
 
