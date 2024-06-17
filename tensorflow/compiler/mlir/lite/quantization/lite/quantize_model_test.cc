@@ -29,6 +29,7 @@ limitations under the License.
 #include "absl/container/flat_hash_set.h"
 #include "flatbuffers/flatbuffer_builder.h"  // from @flatbuffers
 #include "flatbuffers/vector.h"  // from @flatbuffers
+#include "tensorflow/compiler/mlir/lite/quantization/lite/test_util.h"
 #include "tensorflow/compiler/mlir/lite/schema/schema_generated.h"
 #include "tensorflow/compiler/mlir/lite/schema/schema_utils.h"
 #include "tensorflow/core/platform/init_main.h"
@@ -37,7 +38,6 @@ limitations under the License.
 #include "tensorflow/core/util/command_line_flags.h"
 #include "tensorflow/lite/c/c_api_types.h"
 #include "tensorflow/lite/model_builder.h"
-#include "tensorflow/lite/tools/optimize/test_util.h"
 
 // Note: branched from tensorflow/lite/tools/optimize/quantize_model_test.cc
 
@@ -191,7 +191,8 @@ void VerifyQuantizationScale(
 class QuantizeModelTest : public testing::Test {
  protected:
   QuantizeModelTest() {
-    input_model_ = ReadModel(internal::kConvModelWith0Plus10Weights);
+    input_model_ =
+        ReadModel(::mlir::lite::internal::kConvModelWith0Plus10Weights);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -276,7 +277,8 @@ class QuantizeConvModelTest : public QuantizeModelTest,
  protected:
   QuantizeConvModelTest() {
     tensor_type_ = GetParam();
-    input_model_ = ReadModel(internal::kConvModelWith0Plus10Weights);
+    input_model_ =
+        ReadModel(::mlir::lite::internal::kConvModelWith0Plus10Weights);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
     // Flatbuffer is missing calibration data -- add dummy params.
@@ -350,7 +352,7 @@ TEST_P(QuantizeConvModelTest, GraphIsFullyQuantized) {
 class QuantizeConvNoBiasModelTest : public QuantizeModelTest {
  protected:
   QuantizeConvNoBiasModelTest() {
-    input_model_ = ReadModel(internal::kConvModelWithNoBias);
+    input_model_ = ReadModel(::mlir::lite::internal::kConvModelWithNoBias);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -370,7 +372,7 @@ class QuantizeConvNoBiasModelTest : public QuantizeModelTest {
 class QuantizeSplitModelTest : public QuantizeModelTest {
  protected:
   QuantizeSplitModelTest() {
-    input_model_ = ReadModel(internal::kModelSplit);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelSplit);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -456,7 +458,8 @@ class QuantizeConvModel2Test : public QuantizeModelTest,
  protected:
   QuantizeConvModel2Test() {
     tensor_type_ = GetParam();
-    input_model_ = ReadModel(internal::kConvModelWith0Plus10Weights);
+    input_model_ =
+        ReadModel(::mlir::lite::internal::kConvModelWith0Plus10Weights);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
     auto& subgraph = model_.subgraphs[0];
@@ -695,7 +698,8 @@ TEST_P(QuantizeConvModel2Test, VerifyConvDisablePerChannelQuantization) {
 class QuantizeSoftmaxTest : public QuantizeModelTest {
  protected:
   QuantizeSoftmaxTest() {
-    input_model_ = ReadModel(internal::kSingleSoftmaxModelMinMinus5MaxPlus5);
+    input_model_ =
+        ReadModel(::mlir::lite::internal::kSingleSoftmaxModelMinMinus5MaxPlus5);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -759,7 +763,8 @@ TEST_F(QuantizeSoftmaxTest, VerifySoftmaxQuantization) {
 class QuantizeAvgPoolTest : public QuantizeModelTest {
  protected:
   QuantizeAvgPoolTest() {
-    input_model_ = ReadModel(internal::kSingleAvgPoolModelMinMinus5MaxPlus5);
+    input_model_ =
+        ReadModel(::mlir::lite::internal::kSingleAvgPoolModelMinMinus5MaxPlus5);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -820,7 +825,7 @@ TEST_F(QuantizeAvgPoolTest, VerifyAvgPoolQuantization) {
 class QuantizeMultiInputAddWithReshapeTest : public QuantizeModelTest {
  protected:
   QuantizeMultiInputAddWithReshapeTest() {
-    input_model_ = ReadModel(internal::kMultiInputAddWithReshape);
+    input_model_ = ReadModel(::mlir::lite::internal::kMultiInputAddWithReshape);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -943,7 +948,7 @@ class QuantizeConstInputTest : public QuantizeModelTest,
  protected:
   QuantizeConstInputTest() {
     tensor_type_ = GetParam();
-    input_model_ = ReadModel(internal::kConstInputAddModel);
+    input_model_ = ReadModel(::mlir::lite::internal::kConstInputAddModel);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -991,7 +996,7 @@ TEST_P(QuantizeConstInputTest, VerifyConstOpInput) {
 class QuantizeArgMaxTest : public QuantizeModelTest {
  protected:
   QuantizeArgMaxTest() {
-    input_model_ = ReadModel(internal::kModelWithArgMaxOp);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithArgMaxOp);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1037,7 +1042,7 @@ TEST_F(QuantizeArgMaxTest, VerifyArgMax) {
 class QuantizeLSTMTest : public QuantizeModelTest {
  protected:
   QuantizeLSTMTest() {
-    input_model_ = ReadModel(internal::kLstmCalibrated);
+    input_model_ = ReadModel(::mlir::lite::internal::kLstmCalibrated);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1050,7 +1055,7 @@ TEST_F(QuantizeLSTMTest, VerifyLSTM) {
   ASSERT_THAT(status, Eq(kTfLiteOk));
 
   // Read expected model.
-  auto expected_fb_model = ReadModel(internal::kLstmQuantized);
+  auto expected_fb_model = ReadModel(::mlir::lite::internal::kLstmQuantized);
   auto expected_read_only_model = expected_fb_model->GetModel();
   ModelT expected_model;
   expected_read_only_model->UnPackTo(&expected_model);
@@ -1061,7 +1066,7 @@ TEST_F(QuantizeLSTMTest, VerifyLSTM) {
 class QuantizeLSTM2Test : public QuantizeModelTest {
  protected:
   QuantizeLSTM2Test() {
-    input_model_ = ReadModel(internal::kLstmCalibrated2);
+    input_model_ = ReadModel(::mlir::lite::internal::kLstmCalibrated2);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1075,7 +1080,7 @@ TEST_F(QuantizeLSTM2Test, VerifyLSTM) {
   ASSERT_THAT(status, Eq(kTfLiteOk));
 
   // Read expected model.
-  auto expected_fb_model = ReadModel(internal::kLstmQuantized2);
+  auto expected_fb_model = ReadModel(::mlir::lite::internal::kLstmQuantized2);
   auto expected_read_only_model = expected_fb_model->GetModel();
   ModelT expected_model;
   expected_read_only_model->UnPackTo(&expected_model);
@@ -1086,7 +1091,8 @@ TEST_F(QuantizeLSTM2Test, VerifyLSTM) {
 class QuantizeUnidirectionalSequenceLSTMTest : public QuantizeModelTest {
  protected:
   QuantizeUnidirectionalSequenceLSTMTest() {
-    input_model_ = ReadModel(internal::kUnidirectionalSequenceLstmCalibrated);
+    input_model_ = ReadModel(
+        ::mlir::lite::internal::kUnidirectionalSequenceLstmCalibrated);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1101,7 +1107,7 @@ TEST_F(QuantizeUnidirectionalSequenceLSTMTest,
 
   // Read expected model.
   auto expected_fb_model =
-      ReadModel(internal::kUnidirectionalSequenceLstmQuantized);
+      ReadModel(::mlir::lite::internal::kUnidirectionalSequenceLstmQuantized);
   auto expected_read_only_model = expected_fb_model->GetModel();
   ModelT expected_model;
   expected_read_only_model->UnPackTo(&expected_model);
@@ -1112,7 +1118,7 @@ TEST_F(QuantizeUnidirectionalSequenceLSTMTest,
 class QuantizeSVDFTest : public QuantizeModelTest {
  protected:
   QuantizeSVDFTest() {
-    input_model_ = ReadModel(internal::kSvdfCalibrated);
+    input_model_ = ReadModel(::mlir::lite::internal::kSvdfCalibrated);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1126,7 +1132,7 @@ TEST_F(QuantizeSVDFTest, VerifySVDF) {
   ASSERT_THAT(status, Eq(kTfLiteOk));
 
   // Read expected model.
-  auto expected_fb_model = ReadModel(internal::kSvdfQuantized);
+  auto expected_fb_model = ReadModel(::mlir::lite::internal::kSvdfQuantized);
   auto expected_read_only_model = expected_fb_model->GetModel();
   ModelT expected_model;
   expected_read_only_model->UnPackTo(&expected_model);
@@ -1139,7 +1145,7 @@ class QuantizeFCTest : public QuantizeModelTest,
  protected:
   QuantizeFCTest() {
     disable_per_channel_quantization_for_dense_ = GetParam();
-    input_model_ = ReadModel(internal::kModelWithFCOp);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithFCOp);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1390,7 +1396,7 @@ class QuantizeCustomOpTest
       public ::testing::WithParamInterface<tflite::TensorType> {
  protected:
   QuantizeCustomOpTest() {
-    input_model_ = ReadModel(internal::kModelMixed);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelMixed);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1429,7 +1435,7 @@ INSTANTIATE_TEST_SUITE_P(QuantizeCustomOpTest, QuantizeCustomOpTest,
 class QuantizePackTest : public QuantizeModelTest {
  protected:
   QuantizePackTest() {
-    input_model_ = ReadModel(internal::kModelPack);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelPack);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1549,14 +1555,15 @@ TEST_P(QuantizeMinimumMaximumTest, VerifyMinimumMaximum) {
               Eq(input2->quantization->zero_point));
 }
 
-INSTANTIATE_TEST_SUITE_P(MinimumMaximumTestInst, QuantizeMinimumMaximumTest,
-                         testing::ValuesIn({internal::kModelWithMinimumOp,
-                                            internal::kModelWithMaximumOp}));
+INSTANTIATE_TEST_SUITE_P(
+    MinimumMaximumTestInst, QuantizeMinimumMaximumTest,
+    testing::ValuesIn({::mlir::lite::internal::kModelWithMinimumOp,
+                       ::mlir::lite::internal::kModelWithMaximumOp}));
 
 class QuantizeUnpackTest : public QuantizeModelTest {
  protected:
   QuantizeUnpackTest() {
-    input_model_ = ReadModel(internal::kModelWithUnpack);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithUnpack);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1608,7 +1615,7 @@ class QuantizeBroadcastToModelTest
  protected:
   QuantizeBroadcastToModelTest() {
     tensor_type_ = GetParam();
-    input_model_ = ReadModel(internal::kModelWithBroadcastToOp);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithBroadcastToOp);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1672,7 +1679,7 @@ class QuantizeGatherNDModelTest
  protected:
   QuantizeGatherNDModelTest() {
     tensor_type_ = GetParam();
-    input_model_ = ReadModel(internal::kModelWithGatherNDOp);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithGatherNDOp);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }
@@ -1733,7 +1740,7 @@ TEST_P(QuantizeGatherNDModelTest, QuantizeGatherND) {
 class QuantizeWhereModelTest : public QuantizeModelTest {
  protected:
   QuantizeWhereModelTest() {
-    input_model_ = ReadModel(internal::kModelWithWhereOp);
+    input_model_ = ReadModel(::mlir::lite::internal::kModelWithWhereOp);
     readonly_model_ = input_model_->GetModel();
     model_ = UnPackFlatBufferModel(*readonly_model_);
   }

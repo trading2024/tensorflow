@@ -312,6 +312,13 @@ cc_library(
     deps = [
         ":hlo_creation_utils",
         ":hlo_pass",
+        "//xla/hlo/ir:hlo",
+        "@com_google_absl//absl/algorithm:container",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings:string_view",
+        "@local_tsl//tsl/platform:errors",
+        "@local_tsl//tsl/platform:statusor",
     ],
 )
 
@@ -1794,14 +1801,16 @@ cc_library(
     ],
     deps = [
         ":buffer_assignment_proto_cc",
+        ":buffer_value",
         ":buffer_value_containers",
+        ":call_graph",
         ":hlo_alias_analysis",
         ":hlo_buffer",
         ":hlo_dataflow_analysis",
+        ":hlo_ordering",
         ":hlo_proto_cc",
         ":hlo_value",
         ":logical_buffer",
-        ":tuple_points_to_analysis",
         "//xla:shape_util",
         "//xla:status_macros",
         "//xla:types",
