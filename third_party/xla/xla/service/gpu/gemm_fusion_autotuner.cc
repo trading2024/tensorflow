@@ -308,11 +308,6 @@ absl::StatusOr<TileSizeLimit> GetLimits(const HloDotInstruction& dot) {
   const int max_k = tsl::NextPowerOfTwoS64(
       dot.operand(1)->shape().dimensions(contracting_index));
 
-  // TODO(b/337839570): block_k = 16 is bugged in Triton for dots with 8-bit
-  // input. Setting minimum to 32 instead of 16 for these cases.
-  // TODO(b/337838200): Write the restriction on the minimum tile size to be
-  // generic. Currently we only handle the 8-bit case as this was the bug we
-  // ran into.
   return TileSizeLimit{
       /*block_m=*/std::max(max_m, kMinTileSize),
       /*block_n=*/std::max(max_n, kMinTileSize),
@@ -664,8 +659,8 @@ GemmFusionAutotunerImpl::GenerateTritonConfigs(const HloDotInstruction& dot) {
     // TODO(b/337838200): Write the restriction on the minimum tile size to be
     // generic. Currently we only handle the 8-bit case as this was the bug we
     // ran into.
-    if (has_8_bit_operand && config.block_k == kMinTileSize) {
-      config.block_k *= 2;
+    if (has_8_bit_operand && config.block_k == 16) {
+      config.block_k = 32;
     }
 
     // Sparse meta should have at least one element per thread.

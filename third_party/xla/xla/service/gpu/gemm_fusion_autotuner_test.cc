@@ -734,6 +734,32 @@ ENTRY e {
 )");
 }
 
+// TODO(b/337839570): block_k = 16 is bugged in Triton for dots with 8-bit
+// input. Setting minimum to 32 instead of 16 for these cases.
+TEST_F(GemmFusionAutotunerExhaustiveTest, SkipsCrashingTileKConfig) {
+  std::unique_ptr<VerifiedHloModule> module = ParseAndReturnVerifiedModule(R"(
+HloModule module
+ENTRY e {
+  x = s8[33,33]{1,0} parameter(0)
+  c = f16[33,33]{1,0} convert(x)
+  y = f16[33,33]{1,0} parameter(1)
+  ROOT out = f16[33,33]{1,0} dot(c, y), lhs_contracting_dims={1}, rhs_contracting_dims={0}
+}
+)")
+                                                  .value();
+  const se::CudaComputeCapability compute_capability{
+      se::CudaComputeCapability::AMPERE, /*minor=*/0};
+  TF_ASSERT_OK_AND_ASSIGN(
+      const std::vector<TritonGemmConfig> configs,
+      GetPossibleMatmulAutotuneConfigs(
+          *Cast<HloDotInstruction>(
+              module->entry_computation()->root_instruction()),
+          compute_capability, GetToolkitVersion(), GetDebugOptionsForTest()));
+  EXPECT_TRUE(std::all_of(
+      configs.begin(), configs.end(),
+      [](const TritonGemmConfig& config) { return config.block_k > 16; }));
+}
+
 class GemmFusionAutotunerDisableSplitK : public GemmFusionAutotunerTest {
  public:
   DebugOptions GetDebugOptionsForTest() override {
