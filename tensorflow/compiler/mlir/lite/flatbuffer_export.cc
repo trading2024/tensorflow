@@ -81,6 +81,7 @@ limitations under the License.
 #include "mlir/Support/LogicalResult.h"  // from @llvm-project
 #include "stablehlo/dialect/StablehloOps.h"  // from @stablehlo
 #include "stablehlo/dialect/VhloOps.h"  // from @stablehlo
+#include "tensorflow/compiler/mlir/lite/core/c/builtin_op_data.h"
 #include "tensorflow/compiler/mlir/lite/flatbuffer_operator.h"
 #include "tensorflow/compiler/mlir/lite/ir/tfl_ops.h"
 #include "tensorflow/compiler/mlir/lite/metrics/error_collector_inst.h"
@@ -105,7 +106,6 @@ limitations under the License.
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/types.pb.h"
 #include "tensorflow/core/platform/tstring.h"
-#include "tensorflow/lite/core/c/builtin_op_data.h"
 #include "tensorflow/lite/core/interpreter.h"
 #include "tensorflow/lite/core/macros.h"
 #include "tensorflow/lite/delegates/flex/allowlisted_flex_ops.h"
