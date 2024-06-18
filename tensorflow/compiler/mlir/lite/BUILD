@@ -4,6 +4,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@llvm-project//mlir:tblgen.bzl", "gentbl_cc_library", "td_library")
 load("//tensorflow:tensorflow.bzl", "if_google", "if_oss", "tf_cc_binary", "tf_cc_test", "tf_native_cc_binary")
 load("//tensorflow:tensorflow.default.bzl", "filegroup", "get_compatible_with_portable")
+load("//tensorflow/compiler/mlir/lite:build_def.bzl", "tflite_copts_warnings")
 load("//tensorflow/core/platform:rules_cc.bzl", "cc_library")
 
 package(
@@ -1084,6 +1085,7 @@ cc_library(
     deps = [
         ":convert_type",
         ":flatbuffer_tflite_operator_lib",
+        ":lite_version",
         ":low_bit_utils",
         ":stateful_ops_utils",
         ":string_utils",
@@ -1101,7 +1103,6 @@ cc_library(
         "//tensorflow/core:portable_gif_internal",
         "//tensorflow/core:protos_all_cc",
         "//tensorflow/lite:graph_info",
-        "//tensorflow/lite:schema_fbs_version",
         "//tensorflow/lite/core:framework",
         "//tensorflow/lite/core/c:private_common",
         "//tensorflow/lite/delegates/flex:allowlisted_flex_ops_lib",
@@ -1379,6 +1380,7 @@ cc_library(
         "//tensorflow/compiler/mlir/lite/quantization/tensorflow:tf_quantization_passes",
         "//tensorflow/compiler/mlir/lite/stablehlo:compose_uniform_quantized_type_pass",
         "//tensorflow/compiler/mlir/lite/stablehlo:composite_lowering",
+        "//tensorflow/compiler/mlir/lite/stablehlo:legalize_stablehlo_composite_to_tfl_custom",
         "//tensorflow/compiler/mlir/lite/stablehlo:legalize_tf_xla_call_module_to_stablehlo_pass",
         "//tensorflow/compiler/mlir/lite/stablehlo:rename_entrypoint_to_main",
         "//tensorflow/compiler/mlir/lite/stablehlo:tf_legalize_hlo",  # buildcleaner: keep
@@ -1586,3 +1588,12 @@ selects.config_setting_group(
     ],
 )
 # LINT.ThenChange(//tensorflow/lite/BUILD)
+
+# LINT.IfChange(version)
+cc_library(
+    name = "lite_version",
+    hdrs = ["version.h"],
+    compatible_with = get_compatible_with_portable(),
+    copts = tflite_copts_warnings(),
+)
+# LINT.ThenChange(//tensorflow/lite:version)
