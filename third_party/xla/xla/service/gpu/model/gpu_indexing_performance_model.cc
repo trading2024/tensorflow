@@ -351,16 +351,26 @@ GpuPerformanceModelWithIndexingAnalysis::EstimateRunTimeForTriton(
   const auto& fusion_analysis =
       (consumer == nullptr) ? fusion_analysis_cache_->Get(*producer)
                             : fusion_analysis_cache_->Get(*producer, *consumer);
-  auto launch_config = TritonFusion(fusion_analysis).launch_config();
+  auto launch_dimensions = TritonFusion(fusion_analysis).launch_dimensions();
 
-  if (!launch_config.has_value()) {
+  if (!launch_dimensions.has_value()) {
     return absl::InvalidArgumentError(
-        "Could not get launch config for Triton fusion.");
+        "Could not get launch dimensions for Triton fusion.");
   }
 
-  return EstimateRunTimeForTiledFusion(fusion_analysis.fusion(),
-                                       launch_config->launch_dimensions,
-                                       launch_config->output_tile_sizes);
+  if (!fusion_analysis.fusion_backend_config()
+           .has_block_level_fusion_config()) {
+    return absl::InvalidArgumentError(
+        "Could not get block level fusion config for Triton fusion.");
+  }
+
+  auto block_level_parameters =
+      BlockLevelParameters::FromBlockLevelFusionConfig(
+          fusion_analysis.fusion_backend_config().block_level_fusion_config());
+
+  return EstimateRunTimeForTiledFusion(
+      fusion_analysis.fusion(), *launch_dimensions,
+      block_level_parameters.output_tile_sizes);
 }
 
 // Returns the number of warps to use based on the tile size. The numbers were
@@ -388,7 +398,7 @@ LaunchDimensions GetLaunchDimensionsForTiledFusion(
           static_cast<uint64_t>(num_warps * WarpSize())};
 }
 
-absl::StatusOr<std::variant<TiledRunTimeData, FusionDecision>>
+absl::StatusOr<TiledRunTimeDataOrError>
 GpuPerformanceModelWithIndexingAnalysis::TryFindBestTilingForFusion(
     const HloFusionAdaptor& fusion_adaptor) {
   SymbolicTileAnalysisOrError analysis_or_error =

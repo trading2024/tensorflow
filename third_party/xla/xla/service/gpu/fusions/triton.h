@@ -20,22 +20,19 @@ limitations under the License.
 #include <vector>
 
 #include "absl/status/statusor.h"
+#include "absl/types/span.h"
 #include "xla/hlo/ir/hlo_instructions.h"
 #include "xla/service/gpu/fusions/fusion_emitter.h"
 #include "xla/service/gpu/hlo_fusion_analysis.h"
 #include "xla/service/gpu/ir_emitter_context.h"
 #include "xla/service/gpu/launch_dimensions.h"
+#include "xla/shape.h"
 
 namespace xla {
 namespace gpu {
 
 class TritonFusion : public FusionInterface {
  public:
-  struct LaunchConfig {
-    LaunchDimensions launch_dimensions;
-    std::vector<int64_t> output_tile_sizes;
-  };
-
   explicit TritonFusion(const HloFusionAnalysis& analysis)
       : analysis_(analysis) {}
 
@@ -43,9 +40,10 @@ class TritonFusion : public FusionInterface {
       IrEmitterContext& ir_emitter_context,
       const HloFusionInstruction& fusion) const final;
 
-  // Returns the launch dimensions and output tile sizes for softmax fusions.
+  // Returns the launch dimensions for Triton fusions that has a block level
+  // fusion config.
   // Not supported for MatMul fusions yet.
-  std::optional<LaunchConfig> launch_config() const;
+  std::optional<LaunchDimensions> launch_dimensions() const;
 
  private:
   const HloFusionAnalysis& analysis_;
