@@ -105,6 +105,7 @@ tf_proto_library(
         "//xla/service:hlo_proto",
     ],
     visibility = ["//visibility:public"],
+    deps = ["@com_google_protobuf//:any"],
 )
 
 cc_library(
@@ -1206,7 +1207,11 @@ tf_proto_library(
     name = "autotuning_proto",
     srcs = ["autotuning.proto"],
     make_default_target_header_only = True,
-    protodeps = ["@local_tsl//tsl/protobuf:dnn_proto"],
+    protodeps = [
+        "@com_google_protobuf//:any",
+        "@com_google_protobuf//:duration",
+        "@local_tsl//tsl/protobuf:dnn_proto",
+    ],
 )
 
 cc_library(

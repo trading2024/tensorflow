@@ -340,6 +340,7 @@ cc_library(
         ":util",
         ":xplane_to_profile_instructions",
         # placeholder for index annotation deps
+        "@com_google_protobuf//:any_cc_proto",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/base",
         "@com_google_absl//absl/container:flat_hash_map",
@@ -410,7 +411,6 @@ cc_library(
         "@local_tsl//tsl/profiler/lib:profiler_session",
         "@local_tsl//tsl/profiler/lib:traceme",
         "@local_tsl//tsl/profiler/protobuf:profiled_instructions_proto_cc",
-        "@com_google_protobuf//:protobuf",
         "@llvm-project//llvm:Support",
         "@llvm-project//mlir:IR",
     ] + if_cuda([

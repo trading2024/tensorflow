@@ -70,7 +70,10 @@ tf_proto_library(
     name = "xla_host_callback_proto",
     srcs = ["xla_host_callback.proto"],
     cc_api_version = 2,
-    protodeps = ["//xla:xla_data_proto"],
+    protodeps = [
+        "@com_google_protobuf//:any",
+        "//xla:xla_data_proto",
+    ],
 )
 
 tf_proto_library(
